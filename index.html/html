@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Lighthouse Menu</title>
+  <!-- مكتبة Tailwind CSS للتصميم -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- مكتبة الأيقونات Lucide -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <style>
+    /* إخفاء شريط التمرير للأقسام */
+    .no-scrollbar::-webkit-scrollbar { display: none; }
+    .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+  </style>
+</head>
+<body class="bg-gray-50 text-gray-800 pb-24 font-sans">
+
+  <!-- الهيدر -->
+  <header class="bg-white shadow-sm sticky top-0 z-10 px-4 py-4 flex justify-between items-center">
+    <h1 class="text-xl font-bold text-amber-800">Lighthouse Cafe ☕</h1>
+    <button onclick="toggleCart()" class="relative bg-amber-100 p-2 rounded-full text-amber-800 focus:outline-none">
+      <i data-lucide="shopping-bag"></i>
+      <span id="cart-badge" class="hidden absolute -top-1 -right-1 bg-red-500 text-white text-xs w-5 h-5 rounded-full flex items-center justify-center font-bold">0</span>
+    </button>
+  </header>
+
+  <!-- شريط البحث -->
+  <div class="p-4">
+    <div class="relative">
+      <input type="text" id="search-input" oninput="renderMenu()" placeholder="ابحث عن مشروب أو وجبة..." 
+        class="w-full pl-4 pr-10 py-2.5 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-amber-500 bg-white">
+      <i data-lucide="search" class="absolute left-3 top-3 text-gray-400"></i>
+    </div>
+  </div>
+
+  <!-- الأقسام -->
+  <div id="categories-list" class="flex space-x-2 space-x-reverse px-4 overflow-x-auto pb-2 no-scrollbar">
+    <!-- سيتم إدراج الأقسام هنا -->
+  </div>
+
+  <!-- قائمة المنتجات -->
+  <div id="menu-items" class="p-4 grid grid-cols-1 md:grid-cols-2 gap-4 max-w-4xl mx-auto">
+    <!-- سيتم إدراج المنتجات هنا -->
+  </div>
+
+  <!-- سلة الطلبات (Drawer) -->
+  <div id="cart-modal" class="hidden fixed inset-0 bg-black bg-opacity-50 z-50 flex justify-end">
+    <div class="bg-white w-full max-w-md h-full flex flex-col p-4 shadow-xl">
+      <div class="flex justify-between items-center pb-4 border-b">
+        <h2 class="text-lg font-bold">سلة الطلبات</h2>
+        <button onclick="toggleCart()" class="text-gray-500"><i data-lucide="x"></i></button>
+      </div>
+
+      <div id="cart-items" class="flex-1 overflow-y-auto py-4 space-y-4">
+        <!-- عناصر السلة -->
+      </div>
+
+      <div id="cart-footer" class="pt-4 border-t hidden">
+        <div class="flex justify-between text-lg font-bold mb-4">
+          <span>الإجمالي:</span>
+          <span id="total-price" class="text-amber-800">0 ج.م</span>
+        </div>
+        <button onclick="sendToWhatsApp()" class="w-full bg-green-600 text-white py-3 rounded-xl font-bold flex items-center justify-center gap-2 hover:bg-green-700">
+          <i data-lucide="send"></i>
+          <span>إرسال الطلب عبر واتساب</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // 1. رقم الواتساب الخاص بك (اكتب رقمك بالرمز الدولي بدون +)
+    const PHONE_NUMBER = "201000000000";
+
+    // 2. بيانات المنتجات والأقسام
+    const categories = ['الكل', 'مشروبات ساخنة', 'مشروبات باردة', 'حلويات'];
+    const menuData = [
+      { id: 1, name: 'إسبريسو', category: 'مشروبات ساخنة', price: 35, image: 'https://images.unsplash.com/photo-1510591509098-f4fdc6d0ff04?w=300' },
+      { id: 2, name: 'كابتشينو', category: 'مشروبات ساخنة', price: 50, image: 'https://images.unsplash.com/photo-1572442388796-11668a67e53d?w=300' },
+      { id: 3, name: 'آيس لاتيه', category: 'مشروبات باردة', price: 60, image: 'https://images.unsplash.com/photo-1517701604599-bb29b565090c?w=300' },
+      { id: 4, name: 'وافل شوكولاتة', category: 'حلويات', price: 85, image: 'https://images.unsplash.com/photo-1562376552-0d160a2f238d?w=300' }
+    ];
+
+    let currentCategory = 'الكل';
+    let cart = {};
+
+    // عرض أزرار الأقسام
+    function renderCategories() {
+      const container = document.getElementById('categories-list');
+      container.innerHTML = categories.map(cat => `
+        <button onclick="selectCategory('${cat}')" 
+          class="px-4 py-2 rounded-full whitespace-nowrap text-sm font-medium transition-all ${currentCategory === cat ? 'bg-amber-800 text-white' : 'bg-white text-gray-600 border border-gray-200'}">
+          ${cat}
+        </button>
+      `).join('');
+    }
+
+    // عرض المنتجات
+    function renderMenu() {
+      const search = document.getElementById('search-input').value.toLowerCase();
+      const container = document.getElementById('menu-items');
+      
+      const filtered = menuData.filter(item => {
+        const matchesCat = currentCategory === 'الكل' || item.category === currentCategory;
+        const matchesSearch = item.name.toLowerCase().includes(search);
+        return matchesCat && matchesSearch;
+      });
+
+      container.innerHTML = filtered.map(item => `
+        <div class="bg-white p-3 rounded-2xl shadow-sm flex items-center border border-gray-100">
+          <img src="${item.image}" alt="${item.name}" class="w-24 h-24 rounded-xl object-cover">
+          <div class="flex-1 mr-4">
+            <h3 class="font-bold text-gray-900">${item.name}</h3>
+            <p class="text-amber-800 font-bold mt-1">${item.price} ج.م</p>
+          </div>
+          <button onclick="addToCart(${item.id})" class="bg-amber-800 text-white p-2 rounded-xl hover:bg-amber-900">
+            <i data-lucide="plus"></i>
+          </button>
+        </div>
+      `).join('');
+
+      lucide.createIcons();
+    }
+
+    function selectCategory(cat) {
+      currentCategory = cat;
+      renderCategories();
+      renderMenu();
+    }
+
+    // إدارة السلة
+    function addToCart(id) {
+      cart[id] = (cart[id] || 0) + 1;
+      updateCartUI();
+    }
+
+    function updateQuantity(id, change) {
+      if (cart[id]) {
+        cart[id] += change;
+        if (cart[id] <= 0) delete cart[id];
+      }
+      updateCartUI();
+    }
+
+    function updateCartUI() {
+      const cartItemsContainer = document.getElementById('cart-items');
+      const cartFooter = document.getElementById('cart-footer');
+      const cartBadge = document.getElementById('cart-badge');
+      
+      let total = 0;
+      let totalCount = 0;
+      let itemsHTML = '';
+
+      Object.keys(cart).forEach(id => {
+        const item = menuData.find(m => m.id == id);
+        const qty = cart[id];
+        total += item.price * qty;
+        totalCount += qty;
+
+        itemsHTML += `
+          <div class="flex justify-between items-center border-b pb-3">
+            <div>
+              <h4 class="font-bold">${item.name}</h4>
+              <p class="text-sm text-gray-500">${item.price * qty} ج.م</p>
+            </div>
+            <div class="flex items-center space-x-2 space-x-reverse bg-gray-100 rounded-lg p-1">
+              <button onclick="updateQuantity(${item.id}, -1)" class="p-1 text-gray-600"><i data-lucide="minus" class="w-4 h-4"></i></button>
+              <span class="px-2 font-bold">${qty}</span>
+              <button onclick="updateQuantity(${item.id}, 1)" class="p-1 text-gray-600"><i data-lucide="plus" class="w-4 h-4"></i></button>
+            </div>
+          </div>
+        `;
+      });
+
+      if (totalCount > 0) {
+        cartBadge.innerText = totalCount;
+        cartBadge.classList.remove('hidden');
+        cartFooter.classList.remove('hidden');
+        cartItemsContainer.innerHTML = itemsHTML;
+        document.getElementById('total-price').innerText = total + ' ج.م';
+      } else {
+        cartBadge.classList.add('hidden');
+        cartFooter.classList.add('hidden');
+        cartItemsContainer.innerHTML = '<p class="text-center text-gray-400 mt-10">السلة فارغة حالياً</p>';
+      }
+
+      lucide.createIcons();
+    }
+
+    function toggleCart() {
+      document.getElementById('cart-modal').classList.toggle('hidden');
+    }
+
+    function sendToWhatsApp() {
+      let message = "أهلاً، أريد طلب الآتي:\n\n";
+      let total = 0;
+
+      Object.keys(cart).forEach(id => {
+        const item = menuData.find(m => m.id == id);
+        const qty = cart[id];
+        message += `• ${item.name} (عدد ${qty}) - ${item.price * qty} ج.م\n`;
+        total += item.price * qty;
+      });
+
+      message += `\nالإجمالي: ${total} ج.م`;
+      window.open(`https://wa.me/${PHONE_NUMBER}?text=${encodeURIComponent(message)}`, '_blank');
+    }
+
+    // التشغيل الأولي
+    renderCategories();
+    renderMenu();
+    lucide.createIcons();
+  </script>
+</body>
+</html>

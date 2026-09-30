@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>cielo - Menu</title>
+  <!-- خط للوجو يشبه المكتوب على الكوب -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Sacramento&display=swap" rel="stylesheet">
+  
+  <!-- مكتبة Tailwind CSS للتصميم -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- مكتبة الأيقونات Lucide -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+  
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            cielo: {
+              green: '#2d5a43',    // درجة الأخضر المماثلة للأكواب
+              wood: '#5c3a21',     // بني خشبي دافئ
+              beige: '#f5f0eb',    // بيج فاتح راقي
+              gold: '#e6c885',     // لون اللوجو الذهبي على الأكواب
+            }
+          },
+          fontFamily: {
+            logo: ['"Sacramento"', 'cursive']
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    /* إخفاء شريط التمرير للأقسام */
+    .no-scrollbar::-webkit-scrollbar { display: none; }
+    .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+  </style>
+</head>
+<body class="bg-cielo-beige text-gray-800 pb-16 font-sans min-h-screen">
+
+  <!-- الهيدر الرئيسي مع اللوجو المطابق للأكواب -->
+  <header class="bg-cielo-green text-cielo-beige shadow-md sticky top-0 z-10 px-4 py-3 flex justify-center items-center border-b border-cielo-gold/30">
+    <div class="flex items-center gap-1">
+      <span class="font-logo text-4xl text-cielo-gold tracking-wider select-none transform pt-1">cielo</span>
+      <span class="text-cielo-gold text-xs font-bold leading-none -mt-4">♥</span>
+    </div>
+  </header>
+
+  <!-- شريط البحث -->
+  <div class="p-4 max-w-4xl mx-auto">
+    <div class="relative">
+      <input type="text" id="search-input" oninput="renderMenu()" placeholder="ابحث عن مشروبك أو حلاك المفضّل..." 
+        class="w-full pl-4 pr-10 py-3 rounded-2xl border border-cielo-wood/15 focus:outline-none focus:ring-2 focus:ring-cielo-green bg-white shadow-sm placeholder-gray-400">
+      <i data-lucide="search" class="absolute left-3 top-3.5 text-cielo-green/60"></i>
+    </div>
+  </div>
+
+  <!-- قائمة الأقسام -->
+  <div class="max-w-4xl mx-auto">
+    <div id="categories-list" class="flex space-x-2 space-x-reverse px-4 overflow-x-auto pb-3 no-scrollbar">
+      <!-- يتم إدراج الأقسام هنا -->
+    </div>
+  </div>
+
+  <!-- قائمة المنتجات -->
+  <div id="menu-items" class="p-4 grid grid-cols-1 md:grid-cols-2 gap-4 max-w-4xl mx-auto">
+    <!-- يتم إدراج المنتجات هنا -->
+  </div>
+
+  <script>
+    // قائمة الأقسام
+    const categories = [
+      'الكل',
+      'قهوة ساخنة',
+      'مشروبات ساخنة',
+      'قهوة باردة',
+      'فرابيه',
+      'فرابيتشينو',
+      'صودا',
+      'مشروبات غازية',
+      'ميلك شيك',
+      'ايس كريم',
+      'عصائر',
+      'كوكتيل',
+      'سموذي',
+      'ماتشا',
+      'حلويات'
+    ];
+
+    // قائمة البيانات بالأسعار المستخرجة من الصور + الماتشا
+    const menuData = [
+      // 1. القهوة الساخنة[cite: 4]
+      { id: 101, name: 'قهوة تركي', category: 'قهوة ساخنة', price: 45, image: 'https://images.unsplash.com/photo-1510591509098-f4fdc6d0ff04?w=300' },
+      { id: 102, name: 'قهوة تركي دبل', category: 'قهوة ساخنة', price: 60, image: 'https://images.unsplash.com/photo-1510591509098-f4fdc6d0ff04?w=300' },
+      { id: 103, name: 'قهوة فرنساوي', category: 'قهوة ساخنة', price: 65, image: 'https://images.unsplash.com/photo-1572442388796-11668a67e53d?w=300' },
+      { id: 104, name: 'قهوة بندق', category: 'قهوة ساخنة', price: 65, image: 'https://images.unsplash.com/photo-1572442388796-11668a67e53d?w=300' },
+      { id: 105, name: 'اسبريسو سنجل', category: 'قهوة ساخنة', price: 55, image: 'https://images.unsplash.com/photo-1510591509098-f4fdc6d0ff04?w=300' },
+      { id: 106, name: 'اسبريسو دبل', category: 'قهوة ساخنة', price: 65, image: 'https://images.unsplash.com/photo-1510591509098-f4fdc6d0ff04?w=300' },
+      { id: 107, name: 'كابتشينو', category: 'قهوة ساخنة', price: 90, image: 'https://images.unsplash.com/photo-1572442388796-11668a67e53d?w=300' },
+      { id: 107, name: 'فلات وايت', category: 'قهوة ساخنة', price: 95, image: 'https://images.unsplash.com/photo-1572442388796-11668a67e53d?w=300' },
+      { id: 108, name: 'سبانيش لاتيه', category: 'قهوة ساخنة', price: 120, image: 'https://images.unsplash.com/photo-1572442388796-11668a67e53d?w=300' },
+      
+      { id: 109, name: 'مكياتو', category: 'قهوة ساخنة', price: 75, image: 'https://images.unsplash.com/photo-1572442388796-11668a67e53d?w=300' },
+      { id: 109, name: 'كورتادو', category: 'قهوة ساخنة', price: 80, image: 'https://images.unsplash.com/photo-1510591509098-f4fdc6d0ff04?w=300' },
+      { id: 110, name: 'موكا', category: 'قهوة ساخنة', price: 90, image: 'https://images.unsplash.com/photo-1572442388796-11668a67e53d?w=300' },
+      { id: 111, name: 'لاتيه', category: 'قهوة ساخنة', price: 80, image: 'https://images.unsplash.com/photo-1572442388796-11668a67e53d?w=300' },
+      { id: 112, name: 'كراميل لاتيه', category: 'قهوة ساخنة', price: 90, image: 'https://images.unsplash.com/photo-1572442388796-11668a67e53d?w=300' },
+
+      // 2. المشروبات الساخنة[cite: 4]
+      { id: 201, name: 'شاي', category: 'مشروبات ساخنة', price: 30, image: 'https://images.unsplash.com/photo-1576092768241-dec231879fc3?w=300' },
+      { id: 202, name: 'شاي حليب', category: 'مشروبات ساخنة', price: 55, image: 'https://images.unsplash.com/photo-1576092768241-dec231879fc3?w=300' },
+      { id: 203, name: 'شاي اخضر', category: 'مشروبات ساخنة', price: 35, image: 'https://images.unsplash.com/photo-1576092768241-dec231879fc3?w=300' },
+      { id: 204, name: 'ينسون', category: 'مشروبات ساخنة', price: 35, image: 'https://images.unsplash.com/photo-1576092768241-dec231879fc3?w=300' },
+      { id: 204, name: 'نعناع', category: 'مشروبات ساخنة', price: 35, image: 'https://images.unsplash.com/photo-1576092768241-dec231879fc3?w=300' },
+      { id: 204, name: 'قرفة', category: 'مشروبات ساخنة', price: 35, image: 'https://images.unsplash.com/photo-1576092768241-dec231879fc3?w=300' },
+      { id: 204, name: 'كركديه', category: 'مشروبات ساخنة', price: 35, image: 'https://images.unsplash.com/photo-1576092768241-dec231879fc3?w=300' },
+      { id: 205, name: 'كوكتيل أعشاب', category: 'مشروبات ساخنة', price: 65, image: 'https://images.unsplash.com/photo-1576092768241-dec231879fc3?w=300' },
+      { id: 206, name: 'هوت شوكليت', category: 'مشروبات ساخنة', price: 65, image: 'https://images.unsplash.com/photo-1542990253-0d0f5be5f0ed?w=300' },
+      { id: 207, name: 'هوت سدر', category: 'مشروبات ساخنة', price: 65, image: 'https://images.unsplash.com/photo-1576092768241-dec231879fc3?w=300' },
+      { id: 208, name: 'سحلب بالمكسرات', category: 'مشروبات ساخنة', price: 85, image: 'https://images.unsplash.com/photo-1542990253-0d0f5be5f0ed?w=300' },
+
+      // 3. القهوة الباردة (أيس كوفي)[cite: 4]
+      { id: 301, name: 'أيس لاتيه', category: 'قهوة باردة', price: 90, image: 'https://images.unsplash.com/photo-1517701604599-bb29b565090c?w=300' },
+      { id: 302, name: 'أيس لاتيه كراميل', category: 'قهوة باردة', price: 110, image: 'https://images.unsplash.com/photo-1517701604599-bb29b565090c?w=300' },
+      { id: 303, name: 'أيس سبانيش لاتيه', category: 'قهوة باردة', price: 130, image: 'https://images.unsplash.com/photo-1517701604599-bb29b565090c?w=300' },
+      { id: 304, name: 'أيس كابوتشينو', category: 'قهوة باردة', price: 110, image: 'https://images.unsplash.com/photo-1517701604599-bb29b565090c?w=300' },
+      { id: 305, name: 'أيس أمريكانو', category: 'قهوة باردة', price: 70, image: 'https://images.unsplash.com/photo-1517701604599-bb29b565090c?w=300' },
+
+      // 4. فرابيه[cite: 2]
+      { id: 401, name: 'فرابيه مانجو', category: 'فرابيه', price: 100, image: 'https://images.unsplash.com/photo-1570968915860-54d5c301fa9f?w=300' },
+      { id: 402, name: 'فرابيه فراولة', category: 'فرابيه', price: 95, image: 'https://images.unsplash.com/photo-1570968915860-54d5c301fa9f?w=300' },
+      { id: 403, name: 'فرابيه بلوبيري', category: 'فرابيه', price: 95, image: 'https://images.unsplash.com/photo-1570968915860-54d5c301fa9f?w=300' },
+      { id: 404, name: 'فرابيه فانيليا', category: 'فرابيه', price: 90, image: 'https://images.unsplash.com/photo-1570968915860-54d5c301fa9f?w=300' },
+      { id: 405, name: 'فرابيه كراميل', category: 'فرابيه', price: 95, image: 'https://images.unsplash.com/photo-1570968915860-54d5c301fa9f?w=300' },
+      { id: 406, name: 'فرابيه بندق', category: 'فرابيه', price: 95, image: 'https://images.unsplash.com/photo-1570968915860-54d5c301fa9f?w=300' },
+      { id: 407, name: 'فرابيه شوكولاتة', category: 'فرابيه', price: 110, image: 'https://images.unsplash.com/photo-1570968915860-54d5c301fa9f?w=300' },
+
+      // 5. فرابيتشينو[cite: 2]
+      { id: 501, name: 'موكا فرابيه', category: 'فرابيتشينو', price: 110, image: 'https://images.unsplash.com/photo-1570968915860-54d5c301fa9f?w=300' },
+      { id: 502, name: 'كراميل فرابيه', category: 'فرابيتشينو', price: 115, image: 'https://images.unsplash.com/photo-1570968915860-54d5c301fa9f?w=300' },
+      { id: 503, name: 'فانيليا فرابيه', category: 'فرابيتشينو', price: 115, image: 'https://images.unsplash.com/photo-1570968915860-54d5c301fa9f?w=300' },
+      { id: 504, name: 'آيس لاتيه فرابيه', category: 'فرابيتشينو', price: 110, image: 'https://images.unsplash.com/photo-1570968915860-54d5c301fa9f?w=300' },
+
+      // 6. صودا (كوكتيل صودا)[cite: 4]
+      { id: 601, name: 'موهيتو بلو كراوسون', category: 'صودا', price: 85, image: 'https://images.unsplash.com/photo-1513558161293-cdaf765ed2fd?w=300' },
+      { id: 602, name: 'موهيتو فليفر', category: 'صودا', price: 85, image: 'https://images.unsplash.com/photo-1513558161293-cdaf765ed2fd?w=300' },
+      { id: 603, name: 'كريزي ريد بول فليفر', category: 'صودا', price: 130, image: 'https://images.unsplash.com/photo-1513558161293-cdaf765ed2fd?w=300' },
+      { id: 604, name: 'مكس بيري', category: 'صودا', price: 110, image: 'https://images.unsplash.com/photo-1513558161293-cdaf765ed2fd?w=300' },
+      { id: 605, name: 'صن رايز', category: 'صودا', price: 90, image: 'https://images.unsplash.com/photo-1513558161293-cdaf765ed2fd?w=300' },
+      { id: 606, name: 'صن شاين', category: 'صودا', price: 90, image: 'https://images.unsplash.com/photo-1513558161293-cdaf765ed2fd?w=300' },
+      
+
+      // 7. المشروبات الغازية[cite: 4]
+      { id: 701, name: 'ببسي', category: 'مشروبات غازية', price: 55, image: 'https://images.unsplash.com/photo-1622483767028-3f66f32aef97?w=300' },
+      { id: 701, name: 'سفن', category: 'مشروبات غازية', price: 55, image: 'https://images.unsplash.com/photo-1622483767028-3f66f32aef97?w=300' },
+      { id: 702, name: 'فانتا', category: 'مشروبات غازية', price: 55, image: 'https://images.unsplash.com/photo-1622483767028-3f66f32aef97?w=300' },
+      { id: 703, name: 'فيروز', category: 'مشروبات غازية', price: 60, image: 'https://images.unsplash.com/photo-1622483767028-3f66f32aef97?w=300' },
+      { id: 704, name: 'بريل', category: 'مشروبات غازية', price: 55, image: 'https://images.unsplash.com/photo-1622483767028-3f66f32aef97?w=300' },
+      { id: 705, name: 'ريد بول', category: 'مشروبات غازية', price: 95, image: 'https://images.unsplash.com/photo-1622483767028-3f66f32aef97?w=300' },
+      { id: 706, name: 'شويبس', category: 'مشروبات غازية', price: 60, image: 'https://images.unsplash.com/photo-1622483767028-3f66f32aef97?w=300' },
+
+      // 8. ميلك شيك[cite: 2]
+      { id: 801, name: 'ميلك شيك شوكولاتة', category: 'ميلك شيك', price: 100, image: 'https://images.unsplash.com/photo-1572490122747-3968b75cc699?w=300' },
+      { id: 802, name: 'ميلك شيك فانيليا', category: 'ميلك شيك', price: 100, image: 'https://images.unsplash.com/photo-1572490122747-3968b75cc699?w=300' },
+      { id: 803, name: 'ميلك شيك كراميل', category: 'ميلك شيك', price: 100, image: 'https://images.unsplash.com/photo-1572490122747-3968b75cc699?w=300' },
+      { id: 804, name: 'ميلك شيك لوتس', category: 'ميلك شيك', price: 120, image: 'https://images.unsplash.com/photo-1572490122747-3968b75cc699?w=300' },
+      { id: 805, name: 'ميلك شيك نوتيلا', category: 'ميلك شيك', price: 120, image: 'https://images.unsplash.com/photo-1572490122747-3968b75cc699?w=300' },
+      { id: 806, name: 'ميلك شيك أوريو', category: 'ميلك شيك', price: 125, image: 'https://images.unsplash.com/photo-1572490122747-3968b75cc699?w=300' },
+      { id: 807, name: 'ميلك شيك سنيكرز', category: 'ميلك شيك', price: 135, image: 'https://images.unsplash.com/photo-1572490122747-3968b75cc699?w=300' },
+      { id: 808, name: 'ميلك شيك كيت كات', category: 'ميلك شيك', price: 135, image: 'https://images.unsplash.com/photo-1572490122747-3968b75cc699?w=300' },
+      { id: 809, name: 'ميلك شيك فريرو روشيه', category: 'ميلك شيك', price: 145, image: 'https://images.unsplash.com/photo-1572490122747-3968b75cc699?w=300' },
+
+      // 9. آيس كريم[cite: 2]
+      
+      { id: 901, name: 'آيس كريم', category: 'ايس كريم', price: 60, image: 'https://images.unsplash.com/photo-1563805042-7684c019e1cb?w=300' },
+      { id: 901, name: 'آيس كريم فليفر', category: 'ايس كريم', price: 70, image: 'https://images.unsplash.com/photo-1563805042-7684c019e1cb?w=300' },
+      // 10. العصائر الطبيعية[cite: 2]
+      { id: 1001, name: 'عصير مانجو', category: 'عصائر', price: 90, image: 'https://images.unsplash.com/photo-1505252585461-04db1eb84625?w=300' },
+      { id: 1002, name: 'عصير جوافة', category: 'عصائر', price: 80, image: 'https://images.unsplash.com/photo-1505252585461-04db1eb84625?w=300' },
+      { id: 1002, name: 'عصير جوافة نعناع', category: 'عصائر', price: 85, image: 'https://images.unsplash.com/photo-1505252585461-04db1eb84625?w=300' },
+      { id: 1003, name: 'عصير فراولة', category: 'عصائر', price: 80, image: 'https://images.unsplash.com/photo-1505252585461-04db1eb84625?w=300' },
+      { id: 1004, name: 'عصير برتقال', category: 'عصائر', price: 70, image: 'https://images.unsplash.com/photo-1505252585461-04db1eb84625?w=300' },
+      { id: 1005, name: 'عناب', category: 'عصائر', price: 65, image: 'https://images.unsplash.com/photo-1505252585461-04db1eb84625?w=300' },
+      { id: 1005, name: 'عصير ليمون', category: 'عصائر', price: 60, image: 'https://images.unsplash.com/photo-1505252585461-04db1eb84625?w=300' },
+      { id: 1006, name: 'عصير ليمون نعناع', category: 'عصائر', price: 70, image: 'https://images.unsplash.com/photo-1505252585461-04db1eb84625?w=300' },
+      { id: 1007, name: 'زبادو', category: 'عصائر', price: 95, image: 'https://images.unsplash.com/photo-1505252585461-04db1eb84625?w=300' },
+      { id: 1008, name: 'موز باللبن', category: 'عصائر', price: 90, image: 'https://images.unsplash.com/photo-1505252585461-04db1eb84625?w=300' },
+
+      // 11. كوكتيل[cite: 2, 3]
+      { id: 1101, name: 'كوكتيل الفواكه', category: 'كوكتيل', price: 105, image: 'https://images.unsplash.com/photo-1513558161293-cdaf765ed2fd?w=300' },
+      { id: 1102, name: 'بينا كولادا', category: 'كوكتيل', price: 90, image: 'https://images.unsplash.com/photo-1513558161293-cdaf765ed2fd?w=300' },
+      { id: 1103, name: 'تروبيكال', category: 'كوكتيل', price: 110, image: 'https://images.unsplash.com/photo-1513558161293-cdaf765ed2fd?w=300' },
+      { id: 1103, name: 'تشيلو ميكس', category: 'كوكتيل', price: 110, image: 'https://images.unsplash.com/photo-1513558161293-cdaf765ed2fd?w=300' },
+      
+      { id: 1106, name: 'تشيلو كوكتيل', category: 'كوكتيل', price: 125, image: 'https://images.unsplash.com/photo-1513558161293-cdaf765ed2fd?w=300' },
+
+      // 12. سموذي[cite: 3]
+      { id: 1201, name: 'سموذي مانجو', category: 'سموذي', price: 95, image: 'https://images.unsplash.com/photo-1505252585461-04db1eb84625?w=300' },
+      { id: 1201, name: ' سموذي مانجو كيوي', category: 'سموذي', price: 95, image: 'https://images.unsplash.com/photo-1505252585461-04db1eb84625?w=300' },
+      { id: 1201, name: ' سموذي مانجو باشن', category: 'سموذي', price: 100, image: 'https://images.unsplash.com/photo-1505252585461-04db1eb84625?w=300' },
+      { id: 1202, name: 'سموذي فراولة', category: 'سموذي', price: 90, image: 'https://images.unsplash.com/photo-1505252585461-04db1eb84625?w=300' },
+      { id: 1203, name: 'سموذي بلوبيري', category: 'سموذي', price: 90, image: 'https://images.unsplash.com/photo-1505252585461-04db1eb84625?w=300' },
+      { id: 1204, name: 'سموذي كيوى', category: 'سموذي', price: 90, image: 'https://images.unsplash.com/photo-1505252585461-04db1eb84625?w=300' },
+      { id: 1205, name: 'سموذي بينا كولادا', category: 'سموذي', price: 110, image: 'https://images.unsplash.com/photo-1505252585461-04db1eb84625?w=300' },
+      { id: 1206, name: 'سموذي باشن فروت', category: 'سموذي', price: 90, image: 'https://images.unsplash.com/photo-1505252585461-04db1eb84625?w=300' },
+      { id: 1207, name: 'سموذي بلو باشن', category: 'سموذي', price: 95, image: 'https://images.unsplash.com/photo-1505252585461-04db1eb84625?w=300' },
+
+      // 13. ماتشا
+      { id: 1301, name: 'ماتشا لاتيه', category: 'ماتشا', price: 120, image: 'https://images.unsplash.com/photo-1536256263959-770b48d82b0a?w=300' },
+      { id: 1302, name: 'ماتشا اسبرسو لاتيه', category: 'ماتشا', price: 135, image: 'https://images.unsplash.com/photo-1536256263959-770b48d82b0a?w=300' },
+      { id: 1303, name: 'ايس ماتشا لاتيه', category: 'ماتشا', price: 125, image: 'https://images.unsplash.com/photo-1536256263959-770b48d82b0a?w=300' },
+      { id: 1304, name: 'ايس ماتشا فراولة', category: 'ماتشا', price: 140, image: 'https://images.unsplash.com/photo-1536256263959-770b48d82b0a?w=300' },
+      { id: 1305, name: 'ايس ماتشا مانجو', category: 'ماتشا', price: 140, image: 'https://images.unsplash.com/photo-1536256263959-770b48d82b0a?w=300' },
+      { id: 1306, name: 'ايس ماتشا اسبرسو', category: 'ماتشا', price: 145, image: 'https://images.unsplash.com/photo-1536256263959-770b48d82b0a?w=300' },
+
+      // 14. الحلويات[cite: 2]
+      { id: 1401, name: 'تشيز كيك', category: 'حلويات', price: 85, image: 'https://images.unsplash.com/photo-1533134242443-d4fd215305ad?w=300' },
+      { id: 1402, name: 'فادج كيك', category: 'حلويات', price: 90, image: 'https://images.unsplash.com/photo-1578985545062-69928b1d9587?w=300' }
+    ];
+
+    let currentCategory = 'الكل';
+
+    // عرض أزرار الأقسام
+    function renderCategories() {
+      const container = document.getElementById('categories-list');
+      container.innerHTML = categories.map(cat => `
+        <button onclick="selectCategory('${cat}')" 
+          class="px-4 py-2 rounded-2xl whitespace-nowrap text-sm font-medium transition-all shadow-sm ${
+            currentCategory === cat 
+              ? 'bg-cielo-green text-cielo-gold font-bold shadow' 
+              : 'bg-white text-cielo-green border border-cielo-wood/10 hover:bg-cielo-beige'
+          }">
+          ${cat}
+        </button>
+      `).join('');
+    }
+
+    // عرض المنتجات
+    function renderMenu() {
+      const search = document.getElementById('search-input').value.toLowerCase();
+      const container = document.getElementById('menu-items');
+      
+      const filtered = menuData.filter(item => {
+        const matchesCat = currentCategory === 'الكل' || item.category === currentCategory;
+        const matchesSearch = item.name.toLowerCase().includes(search);
+        return matchesCat && matchesSearch;
+      });
+
+      if (filtered.length === 0) {
+        container.innerHTML = `
+          <div class="col-span-full text-center py-12 text-gray-400">
+            <i data-lucide="coffee" class="w-12 h-12 mx-auto mb-2 opacity-30"></i>
+            <p>لا توجد مشروبات متطابقة في هذا القسم حالياً</p>
+          </div>
+        `;
+      } else {
+        container.innerHTML = filtered.map(item => `
+          <div class="bg-white p-3.5 rounded-2xl shadow-sm flex items-center border border-cielo-wood/10 hover:shadow-md transition">
+            <img src="${item.image}" alt="${item.name}" class="w-20 h-20 rounded-xl object-cover flex-shrink-0">
+            <div class="flex-1 mr-4">
+              <div class="flex justify-between items-center">
+                <h3 class="font-bold text-cielo-green text-base">${item.name}</h3>
+                <span class="text-cielo-wood font-bold text-sm bg-cielo-beige px-2.5 py-1 rounded-lg border border-cielo-wood/10">${item.price} ج.م</span>
+              </div>
+              <span class="inline-block mt-2 text-[10px] text-cielo-green/70 bg-cielo-green/5 px-2 py-0.5 rounded-full font-medium">${item.category}</span>
+            </div>
+          </div>
+        `).join('');
+      }
+
+      lucide.createIcons();
+    }
+
+    function selectCategory(cat) {
+      currentCategory = cat;
+      renderCategories();
+      renderMenu();
+    }
+
+    // التشغيل الأولي
+    renderCategories();
+    renderMenu();
+    lucide.createIcons();
+  </script>
+</body>
+</html>
